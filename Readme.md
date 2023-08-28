@@ -1,0 +1,25 @@
+```python
+column_names = [
+    "head_pos_x",
+    "head_pos_y",
+    "head_pos_z",
+    "head_rot_x",
+    "head_rot_y",
+    "head_rot_z",
+    "head_rot_w",
+    "left_hand_pos_x",
+    "left_hand_pos_y",
+    "left_hand_pos_z",
+    "left_hand_rot_x",
+    "left_hand_rot_y",
+    "left_hand_rot_z",
+    "left_hand_rot_w",
+    "right_hand_pos_x",
+    "right_hand_pos_y",
+    "right_hand_pos_z",
+    "right_hand_rot_x",
+    "right_hand_rot_y",
+    "right_hand_rot_z",
+    "right_hand_rot_w"
+]
+```
