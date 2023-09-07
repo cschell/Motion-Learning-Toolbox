@@ -37,7 +37,9 @@ def to_body_relative(
     coordinate_system: Dict[str, str],
     reference_joint="head",
 ):
-    target_dtype = frames.to_numpy().dtype
+
+    reference_pos_columns = [f"{reference_joint}_pos_{xyz}" for xyz in "xyz"]
+    target_dtype = frames[reference_pos_columns[0]].to_numpy().dtype
     min_float32_dtype = "float32" if target_dtype == np.float16 else target_dtype
     
     FORWARD = "xyz".index(coordinate_system["forward"])
@@ -48,8 +50,6 @@ def to_body_relative(
 
     FORWARD_DIRECTION = np.identity(3, dtype=target_dtype)[FORWARD]
     UP_DIRECTION = np.identity(3, dtype=target_dtype)[UP]
-
-    reference_pos_columns = [f"{reference_joint}_pos_{xyz}" for xyz in "xyz"]
 
     num_samples = len(frames)
 
