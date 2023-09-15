@@ -56,7 +56,7 @@ We welcome any discussion, ideas and feedback around this library. Feel free to 
 ## License Information
 
 <p xmlns:cc="http://creativecommons.org/ns#">
-  This work by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://hci.uni-wuerzburg.de">This work by Christian Rack, Lukas Schach and Marc E. Latoschik</a> is
+  This work by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://hci.uni-wuerzburg.de">Christian Rack, Lukas Schach and Marc E. Latoschik</a> is
   licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0
   <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1">
   <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1">
