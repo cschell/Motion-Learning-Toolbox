@@ -1,9 +1,7 @@
-from typing import Dict, Iterable
+from typing import Dict, List
 import quaternionic
 import numpy as np
 import pandas as pd
-from scipy.spatial.transform import Rotation
-from scipy.spatial.transform import Slerp
 
 
 def quaternion_composition(quaternion_array1, quaternion_array2):
@@ -32,12 +30,19 @@ def quaternion_composition(quaternion_array1, quaternion_array2):
 
 
 def to_body_relative(
-    frames,
-    target_joints,
+    frames: pd.DataFrame,
+    target_joints: List[str],
     coordinate_system: Dict[str, str],
     reference_joint="head",
 ):
+    """
+    Transforms position and rotation data into a body-relative coordinate system.
 
+    :param frames: A DataFrame or Series containing position and/or rotation data.
+    :param target_joints: A list of joints to be transformed.
+    :param coordinate_system: A dictionary specifying the coordinate system for the transformation.
+    :param reference_joint: The reference joint used as the origin of the body-relative coordinate system (default is "head").
+    """
     reference_pos_columns = [f"{reference_joint}_pos_{xyz}" for xyz in "xyz"]
     target_dtype = frames[reference_pos_columns[0]].to_numpy().dtype
     min_float32_dtype = "float32" if target_dtype == np.float16 else target_dtype
@@ -76,7 +81,7 @@ def to_body_relative(
 
     ## compute correction rotation
     # find out into which direction the vectors have to be rotated
-    correction_rotation_directions = np.sign(horizontal_plane_projections[:, RIGHT])
+    correction_rotation_directions = -np.sign(horizontal_plane_projections[:, RIGHT])
 
     # build euler angle rotation vector for rotation around UP axis
     # (usage of `.from_axis_angle` feels a bit hacky, but that's easier than building
@@ -124,84 +129,3 @@ def to_body_relative(
 
     return relative_positions_and_rotations
 
-
-def calc_invalid_frames(frame_step_size, change_idxs):
-    return np.concatenate(
-        [np.array(change_idxs) + step for step in range(frame_step_size)]
-    )
-
-
-def compute_velocities_simple(
-    X: pd.DataFrame, frame_step_size: int, change_idxs: Iterable[int], inplace
-) -> pd.DataFrame:
-    velocities = X if inplace else X.copy()
-
-    velocities.iloc[frame_step_size:] = (
-        velocities.values[:-frame_step_size] - velocities.values[frame_step_size:]
-    )
-    velocities.iloc[:frame_step_size] = np.nan
-
-    invalid_frames = calc_invalid_frames(frame_step_size, change_idxs)
-
-    velocities.values[invalid_frames, :] = np.nan
-    velocities = velocities.add_prefix("delta_")
-    return velocities
-
-
-def compute_velocities_quats(
-    X: pd.DataFrame, frame_step_size: int, change_idxs: Iterable[int], inplace
-) -> pd.DataFrame:
-    
-    velocities = X if inplace else X.copy()
-
-    rotation_columns = [c for c in X.columns if "_rot_" in c]
-    assert np.all(rotation_columns == X.columns), "rotation columns are wrong"
-
-    joint_names = set([c[: -len("_rot_x")] for c in rotation_columns])
-
-    for joint_name in joint_names:
-        joint_rotation_names = [f"{joint_name}_rot_{c}" for c in "xyzw"]
-        rotation_data = X[joint_rotation_names]
-
-        # while computing acceleration values, we have to select the nan frames
-        # (i.e., frames dismissed during the previous velocity value computation) and
-        # exclude these
-        nan_idxs = np.arange(len(rotation_data))[rotation_data.isna().any(axis=1)]
-        rot = Rotation.from_quat(X[joint_rotation_names].fillna(0.25))
-        delta_rot = rot[:-frame_step_size].inv() * rot[frame_step_size:]
-        velocities.loc[frame_step_size:, joint_rotation_names] = delta_rot.as_quat()
-
-    invalid_frames = np.concatenate(
-        [
-            calc_invalid_frames(frame_step_size, change_idxs),
-            nan_idxs,
-            nan_idxs + frame_step_size,
-        ]
-    )
-
-    velocities.values[invalid_frames, :] = np.nan
-    velocities = velocities.add_prefix("delta_")
-    return velocities
-
-
-def to_velocity(X, change_idxs=None, inplace=False) -> pd.DataFrame:
-    if not change_idxs:
-        change_idxs = np.array([0])
-
-    velocities = X if inplace else X.copy()
-
-    position_columns = [c for c in X.columns if "_pos_" in c]
-    rotation_columns = [c for c in X.columns if "_rot_" in c]
-
-    frame_step_size = 1
-    velocities[position_columns] = compute_velocities_simple(
-        X[position_columns], frame_step_size, change_idxs, inplace=True
-    )
-    velocities[rotation_columns] = compute_velocities_quats(
-        X[rotation_columns], frame_step_size, change_idxs, inplace=True
-    )
-
-    return velocities
-
-
-to_acceleration = to_velocity
