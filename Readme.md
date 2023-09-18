@@ -18,7 +18,7 @@ These alternative encodings are instrumental in enhancing the ability of machine
 ## Setup Instructions
 To get started with Motion Learning Toolbox, follow these steps:
 
-1. Clone the repository:
+1. Install library:
     ```bash
     pip install motion-learning-toolbox
     ```
