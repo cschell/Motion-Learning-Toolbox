@@ -2,6 +2,8 @@
 
 The Motion Learning Toolbox is a Python library designed to facilitate the preprocessing of motion tracking data in extended reality (XR) setups. It's particularly useful for researchers and engineers wanting to use XR tracking data as input for machine learning models. Originally developed for academic research targeting the identification of XR users by their motions, this toolbox includes a variety of data encoding methods that enhance machine learning model performance.
 
+The library is still in active development and we continue to add and update functionality. Therefore, any feedback and contributions are very welcome!
+
 ## Importance of Data Encoding
 The core features of this library target the encoding of tracking data. Identifying users based on their motions usually starts with a raw stream of positional and rotational data, which we term scene-relative (SR) data. While SR data is informative, it includes information that can distort the learning objectives of identification models.  For instance, SR data includes not just user-specific characteristics but also information about the user's arbitrary position in the VR scene—features that don't contribute to user identity. To alleviate this, Motion Learning Toolbox offers additional encodings, such as:
 
