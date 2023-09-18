@@ -18,12 +18,17 @@ To get started with Motion Learning Toolbox, follow these steps:
 
 1. Clone the repository:
     ```bash
-        pip install [WIP]
+    pip install motion-learning-toolbox
     ```
 
 2. Import the library into your Python script:
     ```python
     import motion_learning_toolbox as mlt
+    ```
+
+3. Use like this:
+    ```python
+    mlt.to_body_relative(...)
     ```
 
 ## Features

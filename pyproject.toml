@@ -1,0 +1,29 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "motion-learning-toolbox"
+version = "1.0.3"
+description = "Python library for preprocessing of XR motion tracking data for machine learning applications."
+readme = "Readme.md"
+authors = [{ name = "Christian Rack", email = "mail@chrisrack.de" }, {name = "Lukas Schach", email="mail.lukas@schach.one" }]
+license = { file = "License.md" }
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3"
+]
+keywords = ["motion_data", "preprocessing"]
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "quaternionic"
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["black", "isort", "pip-tools", "pytest"]
+
+[project.urls]
+"GitHub Repository" = "https://github.com/cschell/Motion-Learning-Toolbox"
