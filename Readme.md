@@ -4,6 +4,14 @@ The Motion Learning Toolbox is a Python library designed to facilitate the prepr
 
 The library is still in active development and we continue to add and update functionality. Therefore, any feedback and contributions are very welcome!
 
+## Origins
+
+The methods and techniques in this library have been developed, analysed and applied in our papers:
+
+1. ["Comparison of Data Encodings and Machine Learning Architectures for User Identification on Arbitrary Motion Sequences"](https://ieeexplore.ieee.org/document/10024474), 2022, C. Rack, A. Hotho and M. E. Latoschik, IEEE AIVR
+2. ["Who Is Alyx? A new Behavioral Biometric Dataset for User Identification in XR"](https://arxiv.org/abs/2308.03788), 2023, C. Rack, T.  Fernando, M. Yalcin, A. Hotho, and M. E. Latoschik, *arXiv e-prints*
+3. ["Extensible Motion-based Identification of XR Users using Non-Specific Motion Data"](https://arxiv.org/abs/2302.07517), 2023, C. Rack, K. Kobs, T. Fernando, A. Hotho, M. E. Latoschik, *arXiv e-prints*
+
 ## Importance of Data Encoding
 The core features of this library target the encoding of tracking data. Identifying users based on their motions usually starts with a raw stream of positional and rotational data, which we term scene-relative (SR) data. While SR data is informative, it includes information that can distort the learning objectives of identification models.  For instance, SR data includes not just user-specific characteristics but also information about the user's arbitrary position in the VR scene—features that don't contribute to user identity. To alleviate this, Motion Learning Toolbox offers additional encodings, such as:
 
@@ -39,7 +47,7 @@ The following methods are explained in detail and demonstrated in [`examples/dem
 
 - Data Cleanup
     - `fix_controller_mapping` - during calibration, XR systems might assign left and right controllers the wrong way around; this methods checks this and renames the columns if necessary.
-    - `resample_recording` – resamples the recording to a constant frame rate, using linear interpolation for positions and Slerping for quaternions.
+    - `resample` – resamples the recording to a constant frame rate, using linear interpolation for positions and Slerping for quaternions.
     - `canonicalize_quaternions` - provides a unique representation for each quaternion, which is desirable for machine learning models.
 - Data Encoding
     - `to_body_relative` - encodes scene-relative (SR) data to body-relative (BR) data.
