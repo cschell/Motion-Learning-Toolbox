@@ -50,7 +50,7 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
         nan_idxs = np.arange(len(rotation_data))[rotation_data.isna().any(axis=1)]
         rot = Rotation.from_quat(data[joint_rotation_names].fillna(0.25))
         delta_rot = rot[:-step_size].inv() * rot[step_size:]
-        velocities[joint_rotation_names].iloc[step_size:] = delta_rot.as_quat()
+        velocities.loc[step_size:, joint_rotation_names] = delta_rot.as_quat()
 
     invalid_frames = np.concatenate(
         [
@@ -72,13 +72,18 @@ def to_velocity(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     :param inplace: If True, the velocities are calculated in-place (default is False).
     :return: A DataFrame containing the calculated velocities.
     """
-
+    if inplace:
+        raise NotImplementedError("Setting inplace=True is currently not supported.")
     velocities = data if inplace else data.copy()
 
     position_columns = [c for c in data.columns if "_pos_" in c]
     rotation_columns = [c for c in data.columns if "_rot_" in c]
 
-    compute_velocities_simple(data[position_columns], inplace=True)
-    compute_velocities_quats(data[rotation_columns], inplace=True)
+    positions = compute_velocities_simple(
+        velocities.loc[:, position_columns], inplace=False
+    )
+    rotations = compute_velocities_quats(
+        velocities.loc[:, rotation_columns], inplace=False
+    )
 
-    return velocities
+    return pd.concat([positions, rotations], axis=1)
