@@ -11,15 +11,13 @@ def compute_velocities_simple(data: pd.DataFrame, inplace=False) -> pd.DataFrame
     :param inplace: If True, the velocities are calculated in-place.
     :return: A DataFrame containing the calculated velocities with "delta_" prefix.
     """
+    position_columns = [c for c in data.columns if "_pos_" in c]
     velocities = data if inplace else data.copy()
 
-    step_size = 1
-
-    velocities.iloc[step_size:] = (
-        velocities.values[step_size:] - velocities.values[:-step_size]
+    velocities[position_columns] = (
+        velocities[position_columns].diff().fillna(np.nan)
     )
-    velocities.iloc[:step_size] = np.nan
-    velocities = velocities.add_prefix("delta_")
+    velocities = velocities.rename(columns={column: f'delta_{column}' for column in position_columns if column in velocities.columns})
     return velocities
 
 
@@ -36,7 +34,7 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     step_size = 1
 
     rotation_columns = [c for c in data.columns if "_rot_" in c]
-    assert np.all(rotation_columns == data.columns), "rotation columns are wrong"
+    #assert np.all(rotation_columns == data.columns), "rotation columns are wrong"
 
     joint_names = set([c[: -len("_rot_x")] for c in rotation_columns])
 
@@ -59,8 +57,10 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
         ]
     )
 
-    velocities.values[invalid_frames, :] = np.nan
-    velocities = velocities.add_prefix("delta_")
+    velocities[rotation_columns].values[invalid_frames, :] = np.nan
+    velocities = velocities.rename(
+        columns={column: f'delta_{column}' for column in rotation_columns if column in velocities.columns})
+
     return velocities
 
 
@@ -72,18 +72,12 @@ def to_velocity(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     :param inplace: If True, the velocities are calculated in-place (default is False).
     :return: A DataFrame containing the calculated velocities.
     """
-    if inplace:
-        raise NotImplementedError("Setting inplace=True is currently not supported.")
     velocities = data if inplace else data.copy()
 
-    position_columns = [c for c in data.columns if "_pos_" in c]
-    rotation_columns = [c for c in data.columns if "_rot_" in c]
-
     positions = compute_velocities_simple(
-        velocities.loc[:, position_columns], inplace=False
+        velocities, inplace
     )
     rotations = compute_velocities_quats(
-        velocities.loc[:, rotation_columns], inplace=False
+        velocities, inplace
     )
-
     return pd.concat([positions, rotations], axis=1)
