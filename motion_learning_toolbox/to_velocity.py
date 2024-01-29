@@ -48,7 +48,8 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
         nan_idxs = np.arange(len(rotation_data))[rotation_data.isna().any(axis=1)]
         rot = Rotation.from_quat(data[joint_rotation_names].fillna(0.25))
         delta_rot = rot[:-step_size].inv() * rot[step_size:]
-        velocities.loc[step_size:, joint_rotation_names] = delta_rot.as_quat()
+        velocities.iloc[step_size:, velocities.columns.get_indexer(joint_rotation_names)] = delta_rot.as_quat()
+        # velocities.loc[step_size:, joint_rotation_names] = delta_rot.as_quat()  # old
 
     invalid_frames = np.concatenate(
         [

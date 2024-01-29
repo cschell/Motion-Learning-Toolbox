@@ -32,7 +32,7 @@ def resample(data: pd.DataFrame, target_fps: float, joint_names: List[str]):
     original_index = features.index.total_seconds() * 1000
     target_index = np.arange(original_index.min(), original_index.max(), mspf)
 
-    interpolated_features = pd.DataFrame(index=pd.TimedeltaIndex(target_index, name="timestamp", unit="ms"))
+    interpolated_features = pd.DataFrame(index=pd.to_timedelta(target_index, unit='ms'))
     features.loc[:, position_columns] = features[position_columns].interpolate("time")
 
     assert not any(features[position_columns].isna().any())
