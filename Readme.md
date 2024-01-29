@@ -68,6 +68,14 @@ In the [`examples`](examples) folder of the repository, you'll find a Jupyter No
 
 We welcome any discussion, ideas and feedback around this library. Feel free to either open an issue on GitHub or directly contact Christian Rack or Lukas Schach.
 
+## Development
+
+### Build and publish library
+
+1. Bump versions in setup.py and pyproject.toml
+2. Build with `python setup.py build`
+3. Upload to pypi with `twine upload -r pypi dist/* --skip-existing`
+
 ## License Information
 
 <p xmlns:cc="http://creativecommons.org/ns#">
@@ -78,4 +86,3 @@ We welcome any discussion, ideas and feedback around this library. Feel free to 
   <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1">
   <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"></a>
 </p>
-
