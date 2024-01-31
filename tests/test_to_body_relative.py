@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 
@@ -36,18 +35,30 @@ def test_br_rotation_of_rotations_and_positions():
     hmd_position = [123, 23, 0]
     right_hand_position = [123, 23, -1]
 
-    left_hand_orientation = Rotation.from_euler("xyz", [0, 90, 30], degrees=True).as_quat()
-    right_hand_orientation = Rotation.from_euler("xyz", [0, 90, 40], degrees=True).as_quat()
+    left_hand_orientation = Rotation.from_euler(
+        "xyz", [0, 90, 30], degrees=True
+    ).as_quat()
+    right_hand_orientation = Rotation.from_euler(
+        "xyz", [0, 90, 40], degrees=True
+    ).as_quat()
     hmd_orientation = Rotation.from_euler("xyz", [0, 90, 50], degrees=True).as_quat()
 
     test_data = [
-        [*left_hand_position, *right_hand_position, *hmd_position, *left_hand_orientation, *right_hand_orientation, *hmd_orientation]
+        [
+            *left_hand_position,
+            *right_hand_position,
+            *hmd_position,
+            *left_hand_orientation,
+            *right_hand_orientation,
+            *hmd_orientation,
+        ]
     ]
     joints = ["left_hand", "right_hand", "hmd"]
 
     test_df = pd.DataFrame(
         test_data,
-        columns=[f"{joint}_pos_{xyz}" for joint in joints for xyz in "xyz"] + [f"{joint}_rot_{xyzw}" for joint in joints for xyzw in "xyzw"],
+        columns=[f"{joint}_pos_{xyz}" for joint in joints for xyz in "xyz"]
+        + [f"{joint}_rot_{xyzw}" for joint in joints for xyzw in "xyzw"],
     )
 
     transformed_data = to_body_relative(
@@ -57,15 +68,40 @@ def test_br_rotation_of_rotations_and_positions():
         coordinate_system={"forward": "z", "right": "x", "up": "y"},
     )
 
-    expected_left_hand_orientation = Rotation.from_euler("xyz", [-30, 0, 0], degrees=True).as_quat()
-    expected_right_hand_orientation = Rotation.from_euler("xyz", [-40, 0, 0], degrees=True).as_quat()
+    expected_left_hand_orientation = Rotation.from_euler(
+        "xyz", [-30, 0, 0], degrees=True
+    ).as_quat()
+    expected_right_hand_orientation = Rotation.from_euler(
+        "xyz", [-40, 0, 0], degrees=True
+    ).as_quat()
     assert np.allclose(
-        transformed_data[["left_hand_rot_x", "left_hand_rot_y", "left_hand_rot_z", "left_hand_rot_w",
-                          "right_hand_rot_x", "right_hand_rot_y", "right_hand_rot_z", "right_hand_rot_w"]], 
-        [[*expected_left_hand_orientation, *expected_right_hand_orientation]])
+        transformed_data[
+            [
+                "left_hand_rot_x",
+                "left_hand_rot_y",
+                "left_hand_rot_z",
+                "left_hand_rot_w",
+                "right_hand_rot_x",
+                "right_hand_rot_y",
+                "right_hand_rot_z",
+                "right_hand_rot_w",
+            ]
+        ],
+        [[*expected_left_hand_orientation, *expected_right_hand_orientation]],
+    )
 
     expected_left_hand_position = [-1, 0, 0]
-    expected_right_hand_position = [1, 0,  0]
+    expected_right_hand_position = [1, 0, 0]
     assert np.allclose(
-        transformed_data[["left_hand_pos_x", "left_hand_pos_y", "left_hand_pos_z", "right_hand_pos_x", "right_hand_pos_y", "right_hand_pos_z"]], 
-        [[*expected_left_hand_position, *expected_right_hand_position]])
+        transformed_data[
+            [
+                "left_hand_pos_x",
+                "left_hand_pos_y",
+                "left_hand_pos_z",
+                "right_hand_pos_x",
+                "right_hand_pos_y",
+                "right_hand_pos_z",
+            ]
+        ],
+        [[*expected_left_hand_position, *expected_right_hand_position]],
+    )

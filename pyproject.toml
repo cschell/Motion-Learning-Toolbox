@@ -27,3 +27,9 @@ dev = ["black", "isort", "pip-tools", "pytest"]
 
 [project.urls]
 "GitHub Repository" = "https://github.com/cschell/Motion-Learning-Toolbox"
+
+[tool.pytest.ini_options]
+python_paths = ["."]
+
+[tool.black]
+line-length = 220

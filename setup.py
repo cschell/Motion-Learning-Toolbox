@@ -15,5 +15,6 @@ setup(
         "scipy",
         "quaternionic",
     ],
+    extras_require={"dev": ["pytest>=6", "flake8", "mypy", "twine"]},
     packages=find_packages(),
 )
