@@ -72,8 +72,8 @@ We welcome any discussion, ideas and feedback around this library. Feel free to 
 
 ### Build and publish library
 
-1. Bump versions in setup.py and pyproject.toml
-2. Build with `python setup.py build` and `python setup.py sdist`
+1. Bump version in pyproject.toml
+2. Build with `python -m build` (make sure `build` is installed, otherwise do `pip install build`)
 3. Upload to pypi with `twine upload -r pypi dist/* --skip-existing`
    - username: __token__
    - password: <api-token: pypi-...> 
