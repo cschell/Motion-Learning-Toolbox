@@ -18,7 +18,7 @@ def compute_velocities_simple(data: pd.DataFrame, inplace=False) -> pd.DataFrame
         velocities[position_columns].diff().fillna(np.nan)
     )
     velocities = velocities.rename(columns={column: f'delta_{column}' for column in position_columns if column in velocities.columns})
-    return velocities
+    return velocities[[f'delta_{column}' for column in position_columns]]
 
 
 def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
@@ -62,7 +62,7 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     velocities = velocities.rename(
         columns={column: f'delta_{column}' for column in rotation_columns if column in velocities.columns})
 
-    return velocities
+    return velocities[[f'delta_{column}' for column in rotation_columns]]
 
 
 def to_velocity(data: pd.DataFrame, inplace=False) -> pd.DataFrame:

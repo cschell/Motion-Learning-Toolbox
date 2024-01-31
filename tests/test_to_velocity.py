@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-from motion_learning_toolbox import compute_velocities_simple, compute_velocities_quats
+from motion_learning_toolbox import compute_velocities_simple, compute_velocities_quats, to_velocity
 
 
 def test_compute_velocities_simple():
@@ -48,3 +48,15 @@ def test_compute_velocities_quats():
     actual_rotations = R.from_quat(test_df.iloc[1:]).as_quat()
 
     assert np.allclose(expected_rotations, actual_rotations)
+
+
+def test_compute_velocities():
+    # Load test data
+    test_df = pd.read_csv("test_data.csv")[["hmd_rot_x", "hmd_rot_y", "hmd_rot_z", "hmd_rot_w", "hmd_pos_x", "hmd_pos_y", "hmd_pos_z"]]
+    velocities_df2 = test_df.copy()
+
+    to_velocity(velocities_df2, inplace=True)
+    velocities_df = to_velocity(test_df)
+
+    # Assumption 1: Output DataFrame has the same number of rows as input
+    assert len(test_df) == len(velocities_df) == len(velocities_df2)
