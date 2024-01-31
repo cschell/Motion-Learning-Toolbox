@@ -73,9 +73,10 @@ We welcome any discussion, ideas and feedback around this library. Feel free to 
 ### Build and publish library
 
 1. Bump versions in setup.py and pyproject.toml
-2. Build with `python setup.py build`
+2. Build with `python setup.py build` and `python setup.py sdist`
 3. Upload to pypi with `twine upload -r pypi dist/* --skip-existing`
-
+   - username: __token__
+   - password: <api-token: pypi-...> 
 ## License Information
 
 <p xmlns:cc="http://creativecommons.org/ns#">
