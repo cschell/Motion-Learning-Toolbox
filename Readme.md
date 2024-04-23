@@ -10,7 +10,7 @@ The methods and techniques in this library have been developed, analysed and app
 
 1. ["Comparison of Data Encodings and Machine Learning Architectures for User Identification on Arbitrary Motion Sequences"](https://ieeexplore.ieee.org/document/10024474), 2022, C. Rack, A. Hotho and M. E. Latoschik, IEEE AIVR
 2. ["Who Is Alyx? A new Behavioral Biometric Dataset for User Identification in XR"](https://www.frontiersin.org/articles/10.3389/frvir.2023.1272234/full), 2023, C. Rack, T.  Fernando, M. Yalcin, A. Hotho, and M. E. Latoschik, Frontiers in Virtual Reality
-3. ["Extensible Motion-based Identification of XR Users using Non-Specific Motion Data"](https://arxiv.org/abs/2302.07517), 2023, C. Rack, K. Kobs, T. Fernando, A. Hotho, M. E. Latoschik, *arXiv e-prints*
+3. ["Versatile User Identification in Extended Reality using Pretrained Similarity-Learning"](https://arxiv.org/abs/2302.07517), 2023, C. Rack, K. Kobs, T. Fernando, A. Hotho, M. E. Latoschik, *arXiv e-prints*
 
 ## Importance of Data Encoding
 The core features of this library target the encoding of tracking data. Identifying users based on their motions usually starts with a raw stream of positional and rotational data, which we term scene-relative (SR) data. While SR data is informative, it includes information that can distort the learning objectives of identification models.  For instance, SR data includes not just user-specific characteristics but also information about the user's arbitrary position in the VR scene—features that don't contribute to user identity. To alleviate this, Motion Learning Toolbox offers additional encodings, such as:
