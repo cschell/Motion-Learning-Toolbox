@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation
 
+from .canonicalize_quaternions import canonicalize_quaternions
 
 def compute_velocities_simple(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     """
@@ -15,7 +16,7 @@ def compute_velocities_simple(data: pd.DataFrame, inplace=False) -> pd.DataFrame
     velocities = data if inplace else data.copy()
 
     velocities[position_columns] = velocities[position_columns].diff().fillna(np.nan)
-    velocities = velocities.rename(columns={column: f"delta_{column}" for column in position_columns if column in velocities.columns})
+    velocities.rename(columns={column: f"delta_{column}" for column in position_columns if column in velocities.columns}, inplace=True)
     return velocities[[f"delta_{column}" for column in position_columns]]
 
 
@@ -32,7 +33,6 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     step_size = 1
 
     rotation_columns = [c for c in data.columns if "_rot_" in c]
-    # assert np.all(rotation_columns == data.columns), "rotation columns are wrong"
 
     joint_names = set([c[: -len("_rot_x")] for c in rotation_columns])
 
@@ -47,7 +47,6 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
         rot = Rotation.from_quat(data[joint_rotation_names].fillna(0.25))
         delta_rot = rot[:-step_size].inv() * rot[step_size:]
         velocities.iloc[step_size:, velocities.columns.get_indexer(joint_rotation_names)] = delta_rot.as_quat()
-        # velocities.loc[step_size:, joint_rotation_names] = delta_rot.as_quat()  # old
 
     invalid_frames = np.concatenate(
         [
@@ -57,7 +56,8 @@ def compute_velocities_quats(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     )
 
     velocities[rotation_columns].values[invalid_frames, :] = np.nan
-    velocities = velocities.rename(columns={column: f"delta_{column}" for column in rotation_columns if column in velocities.columns})
+    canonicalize_quaternions(velocities, joint_names=joint_names, inplace=True)
+    velocities.rename(columns={column: f"delta_{column}" for column in rotation_columns if column in velocities.columns}, inplace=True)
 
     return velocities[[f"delta_{column}" for column in rotation_columns]]
 
@@ -74,4 +74,5 @@ def to_velocity(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
 
     positions = compute_velocities_simple(velocities, inplace)
     rotations = compute_velocities_quats(velocities, inplace)
+    
     return pd.concat([positions, rotations], axis=1)

@@ -3,6 +3,7 @@ import quaternionic
 import numpy as np
 import pandas as pd
 
+from .canonicalize_quaternions import canonicalize_quaternions
 
 def quaternion_composition(quaternion_array1, quaternion_array2):
     w1, x1, y1, z1 = (
@@ -103,5 +104,7 @@ def to_body_relative(
 
     # add horizontal rotations of reference joint
     relative_positions_and_rotations[reference_rotation_names] = (correction_rotations * reference_rotations).normalized.astype(target_dtype).ndarray
+    
+    relative_positions_and_rotations = canonicalize_quaternions(relative_positions_and_rotations, joint_names=[reference_joint, *target_joints])
 
     return relative_positions_and_rotations

@@ -50,16 +50,33 @@ def test_compute_velocities_quats():
     assert np.allclose(expected_rotations, actual_rotations)
 
 
+def test_compute_velocities_canonicalized_quats():
+    # Load test data
+    test_df1 = pd.read_csv("test_data.csv")[["hmd_rot_x", "hmd_rot_y", "hmd_rot_z", "hmd_rot_w"]]
+
+    test_df2 = test_df1.copy()
+    test_df2 *= -1
+
+    vel1 = to_velocity(test_df1)
+    vel2 = to_velocity(test_df2)
+
+    pd.testing.assert_frame_equal(vel1, vel2)
+
+
 def test_compute_velocities():
     # Load test data
-    test_df = pd.read_csv("test_data.csv")[["hmd_rot_x", "hmd_rot_y", "hmd_rot_z", "hmd_rot_w", "hmd_pos_x", "hmd_pos_y", "hmd_pos_z"]]
+    test_df = pd.read_csv("test_data.csv")[["hmd_rot_x", "hmd_rot_y", "hmd_rot_z", "hmd_rot_w", "hmd_pos_x", "hmd_pos_y", "hmd_pos_z"]].astype(float)
     velocities_df2 = test_df.copy()
 
     to_velocity(velocities_df2, inplace=True)
     velocities_df = to_velocity(test_df)
 
-    # Assumption 1: Output DataFrame has the same number of rows as input
     assert len(test_df) == len(velocities_df) == len(velocities_df2)
+
+    pd.testing.assert_frame_equal(
+        velocities_df2.sort_index(axis=1),
+        velocities_df.sort_index(axis=1),
+    )
 
 
 def test_compute_acceleration():

@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
+from scipy.spatial.transform import Rotation as R
+import pytest
 
-from motion_learning_toolbox import to_body_relative
+from motion_learning_toolbox import canonicalize_quaternions, to_body_relative
 
 from scipy.spatial.transform import Rotation
 
+JOINT_NAMES = ["hmd", "left_hand", "right_hand"]
 
 def test_to_body_relative():
     # Load the test data
@@ -28,6 +31,61 @@ def test_to_body_relative():
         test_df
     )  # Ensure the number of samples remains the same
     assert transformed_data.isna().any().sum() == 0
+
+
+def test_to_body_relative_shift_test():
+    # Load the test data
+    A = pd.read_csv("test_data.csv")
+    A.index = pd.to_timedelta(A.timestamp, unit="ms")
+
+    B = A.copy()
+    B[[c for c in B.columns if "_pos_z" in c]] -= 100  # shift positions
+
+    with pytest.raises(expected_exception=AssertionError):
+        pd.testing.assert_frame_equal(A, B)
+
+    target_joints = ["left_hand", "right_hand"]
+    coordinate_system = {"forward": "z", "right": "x", "up": "y"}
+    reference_joint = "hmd"
+
+    # Same motions at different positions should still yield the same BR data
+    A_BR = to_body_relative(A, target_joints, coordinate_system, reference_joint)
+    B_BR = to_body_relative(B, target_joints, coordinate_system, reference_joint)
+
+    pd.testing.assert_frame_equal(A_BR, B_BR)
+
+
+@pytest.mark.parametrize("yaw_offset", np.linspace(-180, 180, 5))
+def test_to_body_relative_rotation_test(yaw_offset: int):
+    # Load the test data
+    A = pd.read_csv("test_data.csv")
+    A.index = pd.to_timedelta(A.timestamp, unit="ms")
+
+    B = A.copy()
+
+    B[[c for c in B.columns if "_pos_" in c]] -= 100  # shift positions
+
+    rot_180_y = R.from_euler("xyz", [0, yaw_offset, 0], degrees=True)
+
+    for prefix in ["hmd", "left_hand", "right_hand"]:
+        rot_columns = [f"{prefix}_rot_{xyzw}" for xyzw in "xyzw"]
+        B[rot_columns] = (rot_180_y * R.from_quat(B[rot_columns])).as_quat()
+
+        pos_cols = [f"{prefix}_pos_{xyz}" for xyz in "xyz"]
+        B[pos_cols] = rot_180_y.apply(B[pos_cols])
+
+    with pytest.raises(expected_exception=AssertionError):
+        pd.testing.assert_frame_equal(A, B)
+
+    target_joints = ["left_hand", "right_hand"]
+    coordinate_system = {"forward": "z", "right": "x", "up": "y"}
+    reference_joint = "hmd"
+
+    # Same motions at different positions should still yield the same BR data
+    A_BR = to_body_relative(A, target_joints, coordinate_system, reference_joint)
+    B_BR = to_body_relative(B, target_joints, coordinate_system, reference_joint)
+
+    pd.testing.assert_frame_equal(A_BR, B_BR, check_exact=False, rtol=1e-05, atol=1e-08)
 
 
 def test_br_rotation_of_rotations_and_positions():
@@ -68,12 +126,20 @@ def test_br_rotation_of_rotations_and_positions():
         coordinate_system={"forward": "z", "right": "x", "up": "y"},
     )
 
-    expected_left_hand_orientation = Rotation.from_euler(
-        "xyz", [-30, 0, 0], degrees=True
-    ).as_quat()
+    expected_left_hand_orientation = Rotation.from_euler("xyz", [-30, 0, 0], degrees=True).as_quat()
     expected_right_hand_orientation = Rotation.from_euler(
         "xyz", [-40, 0, 0], degrees=True
     ).as_quat()
+    R.from_quat(
+        transformed_data[
+            [
+                "left_hand_rot_x",
+                "left_hand_rot_y",
+                "left_hand_rot_z",
+                "left_hand_rot_w",
+            ]
+        ]
+    ).as_euler("xyz", degrees=True)
     assert np.allclose(
         transformed_data[
             [
