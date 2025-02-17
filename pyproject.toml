@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "motion-learning-toolbox"
-version = "1.0.6"
+version = "1.0.7"
 description = "Python library for preprocessing of XR motion tracking data for machine learning applications."
 readme = "Readme.md"
 authors = [{ name = "Christian Rack", email = "mail@chrisrack.de" }, {name = "Lukas Schach", email="mail.lukas@schach.one" }]
