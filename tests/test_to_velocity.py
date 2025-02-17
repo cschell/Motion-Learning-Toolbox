@@ -82,14 +82,19 @@ def test_compute_velocities():
 def test_compute_acceleration():
     # Load test data
     test_df = pd.read_csv("test_data.csv")[["hmd_rot_x", "hmd_rot_y", "hmd_rot_z", "hmd_rot_w", "hmd_pos_x", "hmd_pos_y", "hmd_pos_z"]]
+    acceleration_df2 = test_df.copy()
 
     velocities_df = to_velocity(test_df)
     acceleration_df = to_acceleration(test_df)
+    to_acceleration(acceleration_df2, inplace=True)
 
     # Assumption 1: Output DataFrame has the same number of rows as input
-    assert len(test_df) == len(velocities_df) == len(acceleration_df)
+    assert len(test_df) == len(velocities_df) == len(acceleration_df) == len(acceleration_df2)
 
     # Assumption 2: Output DataFrames are different
     assert np.all(test_df.values == velocities_df.values, axis=1).mean() < 0.1
     assert np.all(acceleration_df.values == velocities_df.values, axis=1).mean() < 0.1
     assert np.all(acceleration_df.values == test_df.values, axis=1).mean() < 0.1
+
+    pd.testing.assert_frame_equal(acceleration_df.sort_index(axis=1), acceleration_df2.sort_index(axis=1))
+

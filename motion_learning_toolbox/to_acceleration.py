@@ -10,8 +10,12 @@ def to_acceleration(data: pd.DataFrame, inplace=False) -> pd.DataFrame:
     :param inplace: If True, the result is stored in the original DataFrame (optional).
     :return: A DataFrame containing the calculated acceleration.
     """
-
-    velocities = to_velocity(data, inplace=inplace)
-    acceleration = to_velocity(velocities, inplace=inplace)
-    return acceleration
+    if inplace:
+        to_velocity(data, inplace=True)
+        to_velocity(data, inplace=True)
+        return data
+    else:
+        velocities = to_velocity(data, inplace=False)
+        acceleration = to_velocity(velocities, inplace=False)
+        return acceleration
 
